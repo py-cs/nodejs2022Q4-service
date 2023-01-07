@@ -1,4 +1,45 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { CreateArtistDTO } from './dto/create-artist.dto';
+import { ArtistsService } from './artists.service';
 
-@Controller('artists')
-export class ArtistsController {}
+@Controller('artist')
+export class ArtistsController {
+  constructor(private artistsService: ArtistsService) {}
+
+  @Get()
+  getAll() {
+    return this.artistsService.getAll();
+  }
+
+  @Get(':id')
+  getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.artistsService.getById(id);
+  }
+
+  @Post()
+  create(@Body() createUserDTO: CreateArtistDTO) {
+    return this.artistsService.create(createUserDTO);
+  }
+
+  @Put(':id')
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updatePasswordDTO: CreateArtistDTO,
+  ) {
+    return this.artistsService.update(id, updatePasswordDTO);
+  }
+
+  @Delete(':id')
+  delete(@Param() id: string) {
+    return this.artistsService.delete(id);
+  }
+}
