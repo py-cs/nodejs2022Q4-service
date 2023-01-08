@@ -63,6 +63,6 @@ export class TracksService {
 
     try {
       this.favoritesService.deleteTrack(id);
-    } catch (e) {}
+    } catch (_) {}
   }
 }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -40,7 +41,7 @@ export class AlbumsController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   delete(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.albumsService.delete(id);
   }
