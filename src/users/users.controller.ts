@@ -11,8 +11,11 @@ import {
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
 import { UsersService } from './users.service';
+import { UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private usersService: UsersService) {}
   @Get()
@@ -39,7 +42,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  delete(@Param() id: string) {
+  delete(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.delete(id);
   }
 }

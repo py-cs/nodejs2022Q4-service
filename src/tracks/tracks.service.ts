@@ -44,10 +44,10 @@ export class TracksService {
   }
 
   delete(id: string): void {
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
-    if (trackIndex === -1) {
+    const track = this.tracks.find((track) => track.id === id);
+    if (!track) {
       throw new NotFoundException('Track not found');
     }
-    this.tracks.splice(trackIndex, 1);
+    this.tracks.filter((track) => track.id !== id);
   }
 }

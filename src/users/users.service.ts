@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
-import { User } from './user.interface';
+import { User } from './user.model';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -21,18 +21,18 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user;
+    return new User(user);
   }
 
-  create(createUserDTO: CreateUserDTO): User {
+  create(createUserDTO: CreateUserDTO): Omit<User, 'password'> {
     const id = uuidv4();
-    const user: User = {
+    const user = new User({
       ...createUserDTO,
       id,
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    };
+    });
     this.users.push(user);
     return user;
   }
@@ -49,7 +49,7 @@ export class UsersService {
     user.updatedAt = Date.now();
     user.version++;
 
-    return user;
+    return new User(user);
   }
 
   delete(id: string): void {
