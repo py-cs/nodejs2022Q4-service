@@ -2,10 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { Album } from './album.inerface';
+import { TracksService } from 'src/tracks/tracks.service';
 
 @Injectable()
 export class AlbumsService {
   private albums: Album[] = [];
+
+  constructor(private tracksService: TracksService) {}
 
   getAll(): Album[] {
     return this.albums;
@@ -43,10 +46,17 @@ export class AlbumsService {
   }
 
   delete(id: string): void {
-    const albumIndex = this.albums.findIndex((album) => album.id === id);
-    if (albumIndex === -1) {
+    const album = this.albums.find((album) => album.id === id);
+    if (!album) {
       throw new NotFoundException('Album not found');
     }
-    this.albums.splice(albumIndex, 1);
+
+    this.albums = this.albums.filter((album) => album.id !== id);
+    const tracksByAlbum = this.tracksService
+      .getAll()
+      .filter((track) => track.albumId === id);
+    tracksByAlbum.forEach(({ id, name, duration, artistId }) =>
+      this.tracksService.update(id, { name, duration, artistId }),
+    );
   }
 }

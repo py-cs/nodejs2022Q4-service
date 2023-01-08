@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -39,7 +40,8 @@ export class ArtistsController {
   }
 
   @Delete(':id')
-  delete(@Param() id: string) {
+  @HttpCode(204)
+  delete(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.artistsService.delete(id);
   }
 }
