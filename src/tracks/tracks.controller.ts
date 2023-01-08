@@ -41,7 +41,7 @@ export class TracksController {
 
   @Delete(':id')
   @HttpCode(204)
-  delete(@Param() id: string) {
+  delete(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.tracksService.delete(id);
   }
 }

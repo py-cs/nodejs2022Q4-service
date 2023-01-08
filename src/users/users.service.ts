@@ -21,7 +21,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return new User(user);
+    return user;
   }
 
   create(createUserDTO: CreateUserDTO): Omit<User, 'password'> {
@@ -39,24 +39,24 @@ export class UsersService {
 
   update(id: string, updatePasswordDTO: UpdatePasswordDTO): User {
     const user = this.getById(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    console.log(
+      `old: ${user.password} verif: ${updatePasswordDTO.oldPassword}`,
+    );
     if (user.password !== updatePasswordDTO.oldPassword) {
       throw new ForbiddenException('Incorrect password');
     }
     user.password = updatePasswordDTO.newPassword;
     user.updatedAt = Date.now();
     user.version++;
-
+    console.log(user);
     return new User(user);
   }
 
   delete(id: string): void {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
+    const user = this.users.find((user) => user.id === id);
+    if (!user) {
       throw new NotFoundException('User not found');
     }
-    this.users.splice(userIndex, 1);
+    this.users = this.users.filter((user) => user.id !== id);
   }
 }

@@ -48,6 +48,6 @@ export class TracksService {
     if (!track) {
       throw new NotFoundException('Track not found');
     }
-    this.tracks.filter((track) => track.id !== id);
+    this.tracks = this.tracks.filter((track) => track.id !== id);
   }
 }

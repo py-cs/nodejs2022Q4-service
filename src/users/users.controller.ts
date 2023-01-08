@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -34,6 +36,7 @@ export class UsersController {
   }
 
   @Put(':id')
+  @Header('Cache-Control', 'no-cache')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updatePasswordDTO: UpdatePasswordDTO,
@@ -42,6 +45,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   delete(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.delete(id);
   }

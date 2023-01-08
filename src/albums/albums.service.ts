@@ -52,6 +52,7 @@ export class AlbumsService {
     }
 
     this.albums = this.albums.filter((album) => album.id !== id);
+
     const tracksByAlbum = this.tracksService
       .getAll()
       .filter((track) => track.albumId === id);
