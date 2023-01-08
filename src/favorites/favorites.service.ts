@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   NotFoundException,
   UnprocessableEntityException,
@@ -11,23 +11,14 @@ import { Favorites } from './favorites.inerface';
 @Injectable()
 export class FavoritesService {
   private favoriteIds: Favorites = { albums: [], artists: [], tracks: [] };
-  // private services: {
-  //   artists: ArtistsService;
-  //   albums: AlbumsService;
-  //   tracks: TracksService;
-  // };
 
   constructor(
     private artistsService: ArtistsService,
+    @Inject(forwardRef(() => AlbumsService))
     private albumsService: AlbumsService,
+    @Inject(forwardRef(() => TracksService))
     private tracksService: TracksService,
-  ) {
-    // this.services = {
-    //   artists: this.artistsService,
-    //   albums: this.albumsService,
-    //   tracks: this.tracksService,
-    // };
-  }
+  ) {}
 
   getAll() {
     const artists = this.favoriteIds.artists.map((id) =>
@@ -44,12 +35,13 @@ export class FavoritesService {
   }
 
   addArtist(id: string) {
-    const candidate = this.artistsService.getById(id);
-    if (!candidate) {
+    try {
+      const candidate = this.artistsService.getById(id);
+      this.favoriteIds.artists.push(id);
+      return `Artist ${candidate.name} added to favorites`;
+    } catch (e) {
       throw new UnprocessableEntityException('Artist not found');
     }
-    this.favoriteIds.artists.push(id);
-    return `Artist ${candidate.name} added to favorites`;
   }
 
   deleteArtist(id: string) {
@@ -62,12 +54,13 @@ export class FavoritesService {
   }
 
   addAlbum(id: string) {
-    const candidate = this.albumsService.getById(id);
-    if (!candidate) {
+    try {
+      const candidate = this.albumsService.getById(id);
+      this.favoriteIds.albums.push(id);
+      return `Album ${candidate.name} added to favorites`;
+    } catch (e) {
       throw new UnprocessableEntityException('Album not found');
     }
-    this.favoriteIds.albums.push(id);
-    return `Album ${candidate.name} added to favorites`;
   }
 
   deleteAlbum(id: string) {
@@ -80,12 +73,13 @@ export class FavoritesService {
   }
 
   addTrack(id: string) {
-    const candidate = this.tracksService.getById(id);
-    if (!candidate) {
+    try {
+      const candidate = this.tracksService.getById(id);
+      this.favoriteIds.tracks.push(id);
+      return `Track ${candidate.name} added to favorites`;
+    } catch (e) {
       throw new UnprocessableEntityException('Track not found');
     }
-    this.favoriteIds.tracks.push(id);
-    return `Track ${candidate.name} added to favorites`;
   }
 
   deleteTrack(id: string) {

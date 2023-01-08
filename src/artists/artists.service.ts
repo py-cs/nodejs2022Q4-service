@@ -1,17 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateArtistDTO } from './dto/create-artist.dto';
 import { Artist } from './artist.inerface';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class ArtistsService {
   private artists: Artist[] = [];
 
   constructor(
+    @Inject(forwardRef(() => AlbumsService))
     private albumsService: AlbumsService,
+    @Inject(forwardRef(() => TracksService))
     private tracksService: TracksService,
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService,
   ) {}
 
   getAll(): Artist[] {
@@ -65,5 +75,9 @@ export class ArtistsService {
       .getAll()
       .filter((track) => track.artistId === id);
     tracksByArtist.forEach((track) => (track.artistId = null));
+
+    try {
+      this.favoritesService.deleteArtist(id);
+    } catch (e) {}
   }
 }
