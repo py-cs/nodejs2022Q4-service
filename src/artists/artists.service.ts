@@ -59,15 +59,11 @@ export class ArtistsService {
     const albumsByArtist = this.albumsService
       .getAll()
       .filter((album) => album.artistId === id);
-    albumsByArtist.forEach(({ id, name, year }) =>
-      this.albumsService.update(id, { name, year }),
-    );
+    albumsByArtist.forEach((track) => (track.artistId = null));
 
     const tracksByArtist = this.tracksService
       .getAll()
       .filter((track) => track.artistId === id);
-    tracksByArtist.forEach(({ id, name, duration, albumId }) =>
-      this.tracksService.update(id, { name, duration, albumId }),
-    );
+    tracksByArtist.forEach((track) => (track.artistId = null));
   }
 }

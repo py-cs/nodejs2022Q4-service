@@ -60,4 +60,40 @@ export class FavoritesService {
       (artistId) => artistId !== id,
     );
   }
+
+  addAlbum(id: string) {
+    const candidate = this.albumsService.getById(id);
+    if (!candidate) {
+      throw new UnprocessableEntityException('Album not found');
+    }
+    this.favoriteIds.albums.push(id);
+    return `Album ${candidate.name} added to favorites`;
+  }
+
+  deleteAlbum(id: string) {
+    if (!this.favoriteIds.albums.includes(id)) {
+      throw new NotFoundException('Album id not found in favorites');
+    }
+    this.favoriteIds.albums = this.favoriteIds.albums.filter(
+      (albumId) => albumId !== id,
+    );
+  }
+
+  addTrack(id: string) {
+    const candidate = this.tracksService.getById(id);
+    if (!candidate) {
+      throw new UnprocessableEntityException('Track not found');
+    }
+    this.favoriteIds.tracks.push(id);
+    return `Track ${candidate.name} added to favorites`;
+  }
+
+  deleteTrack(id: string) {
+    if (!this.favoriteIds.tracks.includes(id)) {
+      throw new NotFoundException('Track id not found in favorites');
+    }
+    this.favoriteIds.tracks = this.favoriteIds.tracks.filter(
+      (trackId) => trackId !== id,
+    );
+  }
 }

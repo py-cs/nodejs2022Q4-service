@@ -39,16 +39,12 @@ export class UsersService {
 
   update(id: string, updatePasswordDTO: UpdatePasswordDTO): User {
     const user = this.getById(id);
-    console.log(
-      `old: ${user.password} verif: ${updatePasswordDTO.oldPassword}`,
-    );
     if (user.password !== updatePasswordDTO.oldPassword) {
       throw new ForbiddenException('Incorrect password');
     }
     user.password = updatePasswordDTO.newPassword;
     user.updatedAt = Date.now();
     user.version++;
-    console.log(user);
     return new User(user);
   }
 

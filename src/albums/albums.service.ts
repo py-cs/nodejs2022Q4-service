@@ -56,8 +56,8 @@ export class AlbumsService {
     const tracksByAlbum = this.tracksService
       .getAll()
       .filter((track) => track.albumId === id);
-    tracksByAlbum.forEach(({ id, name, duration, artistId }) =>
-      this.tracksService.update(id, { name, duration, artistId }),
-    );
+    tracksByAlbum.forEach((track) => {
+      track.albumId = null;
+    });
   }
 }

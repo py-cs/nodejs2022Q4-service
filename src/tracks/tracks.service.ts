@@ -12,11 +12,11 @@ export class TracksService {
   }
 
   getById(id: string): Track {
-    const Track = this.tracks.find((Track) => Track.id === id);
-    if (!Track) {
+    const track = this.tracks.find((Track) => Track.id === id);
+    if (!track) {
       throw new NotFoundException('Track not found');
     }
-    return Track;
+    return track;
   }
 
   create(createTrackDTO: CreateTrackDTO): Track {
