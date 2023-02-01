@@ -72,6 +72,6 @@ export class AlbumsService {
 
     try {
       this.favoritesService.deleteAlbum(id);
-    } catch (_) {}
+    } catch {}
   }
 }

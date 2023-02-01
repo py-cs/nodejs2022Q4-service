@@ -78,6 +78,6 @@ export class ArtistsService {
 
     try {
       this.favoritesService.deleteArtist(id);
-    } catch (_) {}
+    } catch {}
   }
 }
