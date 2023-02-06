@@ -13,9 +13,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
+  app.enableCors();
+
   await readFile(resolve('doc', 'api.yaml'), { encoding: 'utf-8' })
     .then(yaml.load)
-    .then((obj) => SwaggerModule.setup('/docs', app, obj as OpenAPIObject));
+    .then((obj) => {
+      SwaggerModule.setup('/docs', app, {
+        ...(obj as OpenAPIObject),
+        servers: [{ url: `http://localhost:${PORT}` }],
+      });
+    });
 
   await app.listen(PORT);
 }
