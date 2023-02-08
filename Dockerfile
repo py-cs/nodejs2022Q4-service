@@ -6,6 +6,12 @@ COPY package*.json ./
 
 RUN npm ci
 
+COPY prisma ./prisma/
+
+RUN npx prisma generate
+
 COPY . .
 
-CMD ["npm", "run", "start"]
+EXPOSE ${PORT}
+
+CMD ["npm", "run", "start:dev"]

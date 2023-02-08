@@ -10,15 +10,16 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "npx prisma migrate dev --name init && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --config ./test/jest-e2e.json",
-    "test:auth": "cross-env TEST_MODE=auth jest --config ./test/jest-e2e.json",
+    "test:auth": "cross-env TEST_MODE=auth jest --config ./test/-e2e.jjestson",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "db:dev:up": "docker run --name postgres -p 5400:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=home-llibrary -d postgres:15-alpine"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -27,6 +28,7 @@
     "@nestjs/mapped-types": "^1.0.1",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.4",
+    "@prisma/client": "^4.10.0",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
