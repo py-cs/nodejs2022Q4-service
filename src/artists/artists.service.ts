@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDTO } from './dto/create-artist.dto';
 import { Artist } from './artist.inerface';
 import { PrismaService } from 'src/prisma.service';
@@ -11,8 +11,10 @@ export class ArtistsService {
     return this.prismaService.artist.findMany();
   }
 
-  getById(id: string): Promise<Artist> {
-    return this.prismaService.artist.findUniqueOrThrow({ where: { id } });
+  async getById(id: string): Promise<Artist> {
+    const artist = await this.prismaService.artist.findFirst({ where: { id } });
+    if (!artist) throw new NotFoundException();
+    return artist;
   }
 
   create(createArtistDTO: CreateArtistDTO): Promise<Artist> {
@@ -21,14 +23,22 @@ export class ArtistsService {
     });
   }
 
-  update(id: string, updateArtistDTO: CreateArtistDTO): Promise<Artist> {
-    return this.prismaService.artist.update({
-      where: { id },
-      data: updateArtistDTO,
-    });
+  async update(id: string, updateArtistDTO: CreateArtistDTO): Promise<Artist> {
+    try {
+      return await this.prismaService.artist.update({
+        where: { id },
+        data: updateArtistDTO,
+      });
+    } catch {
+      throw new NotFoundException();
+    }
   }
 
   async delete(id: string): Promise<void> {
-    await this.prismaService.artist.delete({ where: { id } });
+    try {
+      await this.prismaService.artist.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException();
+    }
   }
 }

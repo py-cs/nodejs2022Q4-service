@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { Album } from './album.inerface';
 import { PrismaService } from 'src/prisma.service';
@@ -11,8 +11,10 @@ export class AlbumsService {
     return this.prismaService.album.findMany();
   }
 
-  getById(id: string): Promise<Album> {
-    return this.prismaService.album.findUniqueOrThrow({ where: { id } });
+  async getById(id: string): Promise<Album> {
+    const album = await this.prismaService.album.findFirst({ where: { id } });
+    if (!album) throw new NotFoundException();
+    return album;
   }
 
   create(createAlbumDTO: CreateAlbumDTO): Promise<Album> {
@@ -21,14 +23,22 @@ export class AlbumsService {
     });
   }
 
-  update(id: string, updateAlbumDTO: CreateAlbumDTO): Promise<Album> {
-    return this.prismaService.album.update({
-      where: { id },
-      data: updateAlbumDTO,
-    });
+  async update(id: string, updateAlbumDTO: CreateAlbumDTO): Promise<Album> {
+    try {
+      return await this.prismaService.album.update({
+        where: { id },
+        data: updateAlbumDTO,
+      });
+    } catch {
+      throw new NotFoundException();
+    }
   }
 
   async delete(id: string): Promise<void> {
-    await this.prismaService.album.delete({ where: { id } });
+    try {
+      await this.prismaService.album.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException();
+    }
   }
 }
