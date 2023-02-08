@@ -8,6 +8,4 @@ RUN npm ci
 
 COPY . .
 
-COPY ./dist ./dist
-
 CMD ["npm", "run", "start"]
