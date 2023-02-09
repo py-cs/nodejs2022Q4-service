@@ -2,16 +2,10 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 RUN npm ci
 
-COPY prisma ./prisma/
-
-RUN npx prisma generate
-
 COPY . .
 
-EXPOSE ${PORT}
-
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "docker"]
