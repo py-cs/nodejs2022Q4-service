@@ -1,40 +1,44 @@
-version: '3.0'
+version: '3.7'
 
 services:
-  main:
+  app:
     container_name: app
     build:
       context: .
-    env_file:
-      - .env
+      target: development
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     ports:
       - ${PORT}:${PORT}
     command: npm run docker
+    env_file:
+      - .env
+    networks:
+      - app-network
     depends_on:
       - postgres
     restart: always
-    networks:
-      - app_network
+  
   postgres:
     container_name: postgres
     build:
       context: .
       dockerfile: Dockerfile.pg
+    networks:
+      - app-network
     env_file:
       - .env
+    environment:
+      PG_DATA: /var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
-    networks:
-      - app_network
 
 networks:
-  app_network:
+  app-network:
     driver: bridge
 
 volumes:
