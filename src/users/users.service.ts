@@ -5,54 +5,58 @@ import {
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
+import { PrismaService } from 'src/prisma.service';
+import { plainToClass } from 'class-transformer';
 import { User } from './user.model';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  constructor(private prismaService: PrismaService) {}
 
-  getAll(): User[] {
-    return this.users;
+  async getAll() {
+    const users = await this.prismaService.user.findMany();
+    return users.map((user) => plainToClass(User, user));
   }
 
-  getById(id: string): User {
-    const user = this.users.find((user) => user.id === id);
+  async getById(id: string) {
+    const user = await this.prismaService.user.findFirst({ where: { id } });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException();
     }
-    return user;
+    return plainToClass(User, user);
   }
 
-  create(createUserDTO: CreateUserDTO): Omit<User, 'password'> {
-    const id = uuidv4();
-    const user = new User({
-      ...createUserDTO,
-      id,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+  async create(createUserDTO: CreateUserDTO) {
+    const user = await this.prismaService.user.create({
+      data: createUserDTO,
     });
-    this.users.push(user);
-    return user;
+    return plainToClass(User, user);
   }
 
-  update(id: string, updatePasswordDTO: UpdatePasswordDTO): User {
-    const user = this.getById(id);
+  async update(id: string, updatePasswordDTO: UpdatePasswordDTO) {
+    const user = await this.getById(id);
     if (user.password !== updatePasswordDTO.oldPassword) {
       throw new ForbiddenException('Incorrect password');
     }
-    user.password = updatePasswordDTO.newPassword;
-    user.updatedAt = Date.now();
-    user.version++;
-    return new User(user);
+    try {
+      const updatedUser = await this.prismaService.user.update({
+        where: { id },
+        data: {
+          password: updatePasswordDTO.newPassword,
+          version: user.version + 1,
+        },
+      });
+      return plainToClass(User, updatedUser);
+    } catch {
+      throw new NotFoundException();
+    }
   }
 
-  delete(id: string): void {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async delete(id: string): Promise<void> {
+    try {
+      await this.prismaService.user.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException();
     }
-    this.users = this.users.filter((user) => user.id !== id);
   }
 }
