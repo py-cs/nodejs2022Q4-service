@@ -1,28 +1,30 @@
-FROM node:18-alpine As development
+FROM node:18-alpine AS builder
 
 WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
 
-RUN npm install --only=development
+RUN npm ci
+RUN npx prisma generate
 
 COPY . .
 
-RUN npm run build
+FROM node:18-alpine AS development
 
-FROM node:18-alpine as production
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app .
+
+FROM node:18-alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY --from=development /usr/src/app/ .
 
-RUN npm install --only=production
+EXPOSE 4000
 
-COPY . .
-
-COPY --from=development /usr/src/app/dist ./dist
-
-CMD ["node", "dist/main"]
+CMD [ "node", "dist/main" ]

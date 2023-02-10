@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   app:
@@ -8,12 +8,13 @@ services:
       target: development
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - nodemodules:/usr/src/app/node_modules
     ports:
       - ${PORT}:${PORT}
     command: npm run docker
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     networks:
       - app-network
     depends_on:
@@ -27,6 +28,8 @@ services:
       dockerfile: Dockerfile.pg
     networks:
       - app-network
+    env_file:
+      - .env
     environment:
       PG_DATA: /var/lib/postgresql/data
     ports:
@@ -41,3 +44,4 @@ networks:
 
 volumes:
   pgdata:
+  nodemodules: {}

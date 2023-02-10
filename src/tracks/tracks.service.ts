@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../database/prisma.service';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { Track } from './track.interface';
 

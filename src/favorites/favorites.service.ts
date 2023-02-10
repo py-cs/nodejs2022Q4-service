@@ -3,14 +3,14 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common/exceptions';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../database/prisma.service';
 
 @Injectable()
 export class FavoritesService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   getAll() {
-    return this.prismaService.favorites.findFirst({
+    return this.prisma.favorites.findFirst({
       where: { id: true },
       select: {
         albums: {
@@ -32,7 +32,7 @@ export class FavoritesService {
 
   async addArtist(id: string) {
     try {
-      await this.prismaService.artist.update({
+      await this.prisma.artist.update({
         where: { id },
         data: { isFavorite: true },
       });
@@ -43,7 +43,7 @@ export class FavoritesService {
 
   async deleteArtist(id: string) {
     try {
-      await this.prismaService.artist.update({
+      await this.prisma.artist.update({
         where: { id },
         data: { isFavorite: null },
       });
@@ -54,7 +54,7 @@ export class FavoritesService {
 
   async addAlbum(id: string) {
     try {
-      await this.prismaService.album.update({
+      await this.prisma.album.update({
         where: { id },
         data: { isFavorite: true },
       });
@@ -65,7 +65,7 @@ export class FavoritesService {
 
   async deleteAlbum(id: string) {
     try {
-      await this.prismaService.album.update({
+      await this.prisma.album.update({
         where: { id },
         data: { isFavorite: null },
       });
@@ -76,7 +76,7 @@ export class FavoritesService {
 
   async addTrack(id: string) {
     try {
-      await this.prismaService.track.update({
+      await this.prisma.track.update({
         where: { id },
         data: { isFavorite: true },
       });
@@ -87,7 +87,7 @@ export class FavoritesService {
 
   async deleteTrack(id: string) {
     try {
-      await this.prismaService.track.update({
+      await this.prisma.track.update({
         where: { id },
         data: { isFavorite: null },
       });
