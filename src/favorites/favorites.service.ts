@@ -45,7 +45,7 @@ export class FavoritesService {
     try {
       await this.prisma.artist.update({
         where: { id },
-        data: { isFavorite: null },
+        data: { isFavorite: false },
       });
     } catch {
       throw new NotFoundException();
@@ -67,7 +67,7 @@ export class FavoritesService {
     try {
       await this.prisma.album.update({
         where: { id },
-        data: { isFavorite: null },
+        data: { isFavorite: false },
       });
     } catch {
       throw new NotFoundException();
@@ -89,7 +89,7 @@ export class FavoritesService {
     try {
       await this.prisma.track.update({
         where: { id },
-        data: { isFavorite: null },
+        data: { isFavorite: false },
       });
     } catch {
       throw new NotFoundException();

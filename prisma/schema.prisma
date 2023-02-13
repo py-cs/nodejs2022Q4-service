@@ -28,7 +28,7 @@ model Artist {
   Track Track[]
 
   Favorites  Favorites? @relation(fields: [isFavorite], references: [id])
-  isFavorite Boolean?
+  isFavorite Boolean    @default(false)
 }
 
 model Album {
@@ -42,7 +42,7 @@ model Album {
   Track Track[]
 
   Favorites  Favorites? @relation(fields: [isFavorite], references: [id])
-  isFavorite Boolean?
+  isFavorite Boolean    @default(false)
 }
 
 model Track {
@@ -57,7 +57,7 @@ model Track {
   albumId String?
 
   Favorites  Favorites? @relation(fields: [isFavorite], references: [id])
-  isFavorite Boolean?
+  isFavorite Boolean    @default(false)
 }
 
 model Favorites {

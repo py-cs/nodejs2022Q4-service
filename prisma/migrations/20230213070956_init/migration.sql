@@ -15,7 +15,7 @@ CREATE TABLE "Artist" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "grammy" BOOLEAN NOT NULL,
-    "isFavorite" BOOLEAN,
+    "isFavorite" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Artist_pkey" PRIMARY KEY ("id")
 );
@@ -26,7 +26,7 @@ CREATE TABLE "Album" (
     "name" TEXT NOT NULL,
     "year" INTEGER NOT NULL,
     "artistId" TEXT,
-    "isFavorite" BOOLEAN,
+    "isFavorite" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Album_pkey" PRIMARY KEY ("id")
 );
@@ -38,7 +38,7 @@ CREATE TABLE "Track" (
     "duration" INTEGER NOT NULL,
     "artistId" TEXT,
     "albumId" TEXT,
-    "isFavorite" BOOLEAN,
+    "isFavorite" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Track_pkey" PRIMARY KEY ("id")
 );
@@ -51,13 +51,13 @@ CREATE TABLE "Favorites" (
 );
 
 -- AddForeignKey
-ALTER TABLE "Artist" ADD CONSTRAINT "Artist_isFavorite_fkey" FOREIGN KEY ("isFavorite") REFERENCES "Favorites"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Artist" ADD CONSTRAINT "Artist_isFavorite_fkey" FOREIGN KEY ("isFavorite") REFERENCES "Favorites"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Album" ADD CONSTRAINT "Album_artistId_fkey" FOREIGN KEY ("artistId") REFERENCES "Artist"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Album" ADD CONSTRAINT "Album_isFavorite_fkey" FOREIGN KEY ("isFavorite") REFERENCES "Favorites"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Album" ADD CONSTRAINT "Album_isFavorite_fkey" FOREIGN KEY ("isFavorite") REFERENCES "Favorites"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Track" ADD CONSTRAINT "Track_artistId_fkey" FOREIGN KEY ("artistId") REFERENCES "Artist"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -66,6 +66,7 @@ ALTER TABLE "Track" ADD CONSTRAINT "Track_artistId_fkey" FOREIGN KEY ("artistId"
 ALTER TABLE "Track" ADD CONSTRAINT "Track_albumId_fkey" FOREIGN KEY ("albumId") REFERENCES "Album"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Track" ADD CONSTRAINT "Track_isFavorite_fkey" FOREIGN KEY ("isFavorite") REFERENCES "Favorites"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Track" ADD CONSTRAINT "Track_isFavorite_fkey" FOREIGN KEY ("isFavorite") REFERENCES "Favorites"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-INSERT INTO "Favorites" DEFAULT VALUES ON CONFLICT DO NOTHING;
+INSERT INTO "Favorites" ("id") VALUES (true) ON CONFLICT DO NOTHING;
+INSERT INTO "Favorites" ("id") VALUES (false) ON CONFLICT DO NOTHING;
