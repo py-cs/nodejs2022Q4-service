@@ -3,16 +3,25 @@ import { CreateArtistDTO } from './dto/create-artist.dto';
 import { Artist } from './artist.inerface';
 import { PrismaService } from '../database/prisma.service';
 
+const select = {
+  id: true,
+  name: true,
+  grammy: true,
+};
+
 @Injectable()
 export class ArtistsService {
   constructor(private prismaService: PrismaService) {}
 
   getAll(): Promise<Artist[]> {
-    return this.prismaService.artist.findMany();
+    return this.prismaService.artist.findMany({ select });
   }
 
   async getById(id: string): Promise<Artist> {
-    const artist = await this.prismaService.artist.findFirst({ where: { id } });
+    const artist = await this.prismaService.artist.findFirst({
+      where: { id },
+      select,
+    });
     if (!artist) throw new NotFoundException();
     return artist;
   }
@@ -20,6 +29,7 @@ export class ArtistsService {
   create(createArtistDTO: CreateArtistDTO): Promise<Artist> {
     return this.prismaService.artist.create({
       data: createArtistDTO,
+      select,
     });
   }
 
@@ -28,6 +38,7 @@ export class ArtistsService {
       return await this.prismaService.artist.update({
         where: { id },
         data: updateArtistDTO,
+        select,
       });
     } catch {
       throw new NotFoundException();
