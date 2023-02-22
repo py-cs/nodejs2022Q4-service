@@ -12,14 +12,14 @@ const select = {
 
 @Injectable()
 export class AlbumsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   getAll(): Promise<Album[]> {
-    return this.prismaService.album.findMany({ select });
+    return this.prisma.album.findMany({ select });
   }
 
   async getById(id: string): Promise<Album> {
-    const album = await this.prismaService.album.findFirst({
+    const album = await this.prisma.album.findFirst({
       where: { id },
       select,
     });
@@ -28,7 +28,7 @@ export class AlbumsService {
   }
 
   create(createAlbumDTO: CreateAlbumDTO): Promise<Album> {
-    return this.prismaService.album.create({
+    return this.prisma.album.create({
       data: createAlbumDTO,
       select,
     });
@@ -36,7 +36,7 @@ export class AlbumsService {
 
   async update(id: string, updateAlbumDTO: CreateAlbumDTO): Promise<Album> {
     try {
-      return await this.prismaService.album.update({
+      return await this.prisma.album.update({
         where: { id },
         data: updateAlbumDTO,
         select,
@@ -48,7 +48,7 @@ export class AlbumsService {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prismaService.album.delete({ where: { id } });
+      await this.prisma.album.delete({ where: { id } });
     } catch {
       throw new NotFoundException();
     }

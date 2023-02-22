@@ -3,58 +3,78 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
 import { PrismaService } from '../database/prisma.service';
-import { plainToClass } from 'class-transformer';
-import { User } from './user.model';
 
 @Injectable()
 export class UsersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   async getAll() {
-    const users = await this.prismaService.user.findMany();
-    return users.map((user) => plainToClass(User, user));
+    return this.prisma.user.findMany();
   }
 
   async getById(id: string) {
-    const user = await this.prismaService.user.findFirst({ where: { id } });
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return plainToClass(User, user);
+    const user = await this.prisma.user.findFirst({ where: { id } });
+    if (!user) throw new NotFoundException();
+    return user;
   }
 
-  async create(createUserDTO: CreateUserDTO) {
-    const user = await this.prismaService.user.create({
-      data: createUserDTO,
+  async getByLogin(login: string) {
+    return this.prisma.user.findFirst({ where: { login } });
+  }
+
+  async create({ login, password }: CreateUserDTO) {
+    const passwordHash = await bcrypt.hash(password, 5);
+
+    return this.prisma.user.create({
+      data: { login, password: passwordHash },
     });
-    return plainToClass(User, user);
   }
 
-  async update(id: string, updatePasswordDTO: UpdatePasswordDTO) {
+  async updatePassword(
+    id: string,
+    { newPassword, oldPassword }: UpdatePasswordDTO,
+  ) {
     const user = await this.getById(id);
-    if (user.password !== updatePasswordDTO.oldPassword) {
+    if (!user) throw new NotFoundException();
+
+    const isCorrectPassword = await bcrypt.compare(oldPassword, user.password);
+    if (!isCorrectPassword) {
       throw new ForbiddenException('Incorrect password');
     }
-    try {
-      const updatedUser = await this.prismaService.user.update({
-        where: { id },
-        data: {
-          password: updatePasswordDTO.newPassword,
-          version: user.version + 1,
-        },
-      });
-      return plainToClass(User, updatedUser);
-    } catch {
-      throw new NotFoundException();
-    }
+
+    const newPasswordHash = await bcrypt.hash(
+      newPassword,
+      +process.env.CRYPT_SALT,
+    );
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        password: newPasswordHash,
+        version: user.version + 1,
+      },
+    });
+  }
+
+  async updateRefreshHash(
+    id: string,
+    refreshHash: string | null,
+  ): Promise<void> {
+    const user = await this.getById(id);
+    if (!user) throw new NotFoundException();
+    await this.prisma.user.update({
+      where: { id: id },
+      data: { refreshHash },
+    });
   }
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prismaService.user.delete({ where: { id } });
+      await this.prisma.user.delete({ where: { id } });
     } catch {
       throw new NotFoundException();
     }

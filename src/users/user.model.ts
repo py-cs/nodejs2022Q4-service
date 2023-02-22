@@ -10,6 +10,8 @@ export class User {
   createdAt: number;
   @Type(() => Number)
   updatedAt: number;
+  @Exclude({ toPlainOnly: true })
+  refreshHash: string;
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

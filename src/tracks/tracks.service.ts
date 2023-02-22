@@ -13,14 +13,14 @@ const select = {
 
 @Injectable()
 export class TracksService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   getAll(): Promise<Track[]> {
-    return this.prismaService.track.findMany({ select });
+    return this.prisma.track.findMany({ select });
   }
 
   async getById(id: string): Promise<Track> {
-    const track = await this.prismaService.track.findFirst({
+    const track = await this.prisma.track.findFirst({
       where: { id },
       select,
     });
@@ -29,7 +29,7 @@ export class TracksService {
   }
 
   create(createTrackDTO: CreateTrackDTO): Promise<Track> {
-    return this.prismaService.track.create({
+    return this.prisma.track.create({
       data: createTrackDTO,
       select,
     });
@@ -37,7 +37,7 @@ export class TracksService {
 
   async update(id: string, updateTrackDTO: CreateTrackDTO): Promise<Track> {
     try {
-      return await this.prismaService.track.update({
+      return await this.prisma.track.update({
         where: { id },
         data: updateTrackDTO,
         select,
@@ -49,7 +49,7 @@ export class TracksService {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prismaService.track.delete({ where: { id } });
+      await this.prisma.track.delete({ where: { id } });
     } catch {
       throw new NotFoundException();
     }

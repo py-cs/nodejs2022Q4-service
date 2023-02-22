@@ -16,33 +16,39 @@ import { UpdatePasswordDTO } from './dto/update-password.dto';
 import { UsersService } from './users.service';
 import { UseInterceptors } from '@nestjs/common';
 import { ClassSerializerInterceptor } from '@nestjs/common';
+import { TransformPlainToInstance } from 'class-transformer';
+import { User } from './user.model';
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private usersService: UsersService) {}
   @Get()
-  getAll() {
-    return this.usersService.getAll();
+  @TransformPlainToInstance(User)
+  async getAll() {
+    return await this.usersService.getAll();
   }
 
   @Get(':id')
-  getById(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.usersService.getById(id);
+  @TransformPlainToInstance(User)
+  async getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    return await this.usersService.getById(id);
   }
 
   @Post()
-  create(@Body() createUserDTO: CreateUserDTO) {
-    return this.usersService.create(createUserDTO);
+  @TransformPlainToInstance(User)
+  async create(@Body() createUserDTO: CreateUserDTO) {
+    return await this.usersService.create(createUserDTO);
   }
 
   @Put(':id')
   @Header('Cache-Control', 'no-cache')
-  update(
+  @TransformPlainToInstance(User)
+  async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updatePasswordDTO: UpdatePasswordDTO,
   ) {
-    return this.usersService.update(id, updatePasswordDTO);
+    return await this.usersService.updatePassword(id, updatePasswordDTO);
   }
 
   @Delete(':id')
