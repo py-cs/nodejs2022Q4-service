@@ -16,8 +16,8 @@ import { Public } from '../common/decorators/public.decorator';
 import { TransformPlainToInstance } from 'class-transformer';
 import { User } from '../users/user.model';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
-import { GetRefreshToken } from 'src/common/decorators/get-token.decorator';
+import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
+import { GetRefreshToken } from '../common/decorators/get-token.decorator';
 
 @Controller('auth')
 export class AuthController {

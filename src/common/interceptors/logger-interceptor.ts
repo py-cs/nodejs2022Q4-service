@@ -13,10 +13,21 @@ export class LoggerInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const { url, query, body } = request;
 
-    const message = `[${context.getClass().name}] - ${url} - ${JSON.stringify(
-      query,
-    )} - ${JSON.stringify(body)}}`;
-
-    return next.handle().pipe(tap(() => Logger.log(message)));
+    // TODO: message format
+    return next.handle().pipe(
+      tap(async (response) => {
+        const message = `----
+Incoming request:
+[${context.getClass().name}]
+URL: ${url}
+Query params: ${JSON.stringify(query)}
+Body: ${JSON.stringify(body)}
+Response: ${context.switchToHttp().getResponse().statusCode} ${JSON.stringify(
+          response,
+        )}
+`;
+        Logger.log(message);
+      }),
+    );
   }
 }
