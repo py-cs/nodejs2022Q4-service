@@ -9,7 +9,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core/constants';
 import { JwtAccessGuard } from './auth/guards/jwt-access.guard';
-import { AppExceptionFilter } from './common/exception-filter';
+import { AppExceptionFilter } from './common/filters/exception-filter';
 import { LoggerInterceptor } from './common/interceptors/logger-interceptor';
 import { LoggerModule } from './logger/logger.module';
 

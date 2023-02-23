@@ -12,7 +12,9 @@ export class AppExceptionFilter implements ExceptionFilter {
   constructor() {
     ['uncaughtException', 'unhandledRejection'].forEach((event) =>
       process.on(event, () => {
-        throw new Error(`Internal error (${event})`);
+        console.log(event, '!!! internal');
+
+        // throw new Error(`Internal error (${event})`);
       }),
     );
   }
