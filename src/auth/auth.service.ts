@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
@@ -28,7 +28,7 @@ export class AuthService {
     const { login, password } = authDTO;
     const candidate = await this.userService.getByLogin(login);
 
-    if (candidate) throw new BadRequestException(AuthMessages.USER_EXISTS);
+    if (candidate) throw new ConflictException(AuthMessages.USER_EXISTS);
 
     const user = await this.userService.create({
       login,
