@@ -1,12 +1,9 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
 import { PrismaService } from '../database/prisma.service';
+import { errors } from '../common/utils/errors';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +15,7 @@ export class UsersService {
 
   async getById(id: string) {
     const user = await this.prisma.user.findFirst({ where: { id } });
-    if (!user) throw new NotFoundException();
+    if (!user) throw errors.notFound('User', id);
     return user;
   }
 
@@ -39,7 +36,7 @@ export class UsersService {
     { newPassword, oldPassword }: UpdatePasswordDTO,
   ) {
     const user = await this.getById(id);
-    if (!user) throw new NotFoundException();
+    if (!user) throw errors.notFound('User', id);
 
     const isCorrectPassword = await bcrypt.compare(oldPassword, user.password);
     if (!isCorrectPassword) {
@@ -65,7 +62,7 @@ export class UsersService {
     refreshHash: string | null,
   ): Promise<void> {
     const user = await this.getById(id);
-    if (!user) throw new NotFoundException();
+    if (!user) throw errors.notFound('User', id);
     await this.prisma.user.update({
       where: { id: id },
       data: { refreshHash },
@@ -76,7 +73,7 @@ export class UsersService {
     try {
       await this.prisma.user.delete({ where: { id } });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('User', id);
     }
   }
 }

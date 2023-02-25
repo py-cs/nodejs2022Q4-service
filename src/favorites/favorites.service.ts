@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common/exceptions';
+import { errors } from '../common/utils/errors';
 import { PrismaService } from '../database/prisma.service';
 
 @Injectable()
@@ -37,7 +34,7 @@ export class FavoritesService {
         data: { isFavorite: true },
       });
     } catch {
-      throw new UnprocessableEntityException();
+      throw errors.unableToAddToFavorites('Artist', id);
     }
   }
 
@@ -48,7 +45,7 @@ export class FavoritesService {
         data: { isFavorite: false },
       });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Artist', id);
     }
   }
 
@@ -59,7 +56,7 @@ export class FavoritesService {
         data: { isFavorite: true },
       });
     } catch {
-      throw new UnprocessableEntityException();
+      throw errors.unableToAddToFavorites('Album', id);
     }
   }
 
@@ -70,7 +67,7 @@ export class FavoritesService {
         data: { isFavorite: false },
       });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Album', id);
     }
   }
 
@@ -81,7 +78,7 @@ export class FavoritesService {
         data: { isFavorite: true },
       });
     } catch {
-      throw new UnprocessableEntityException();
+      throw errors.unableToAddToFavorites('Track', id);
     }
   }
 
@@ -92,7 +89,7 @@ export class FavoritesService {
         data: { isFavorite: false },
       });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Track', id);
     }
   }
 }

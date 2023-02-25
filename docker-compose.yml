@@ -9,7 +9,7 @@ services:
     volumes:
       - ./src:/usr/src/app/src
       - nodemodules:/usr/src/app/node_modules
-      - applogs:/usr/src/app/${LOG_DIRECTORY}
+      - ./${LOG_DIRECTORY}:/usr/src/app/${LOG_DIRECTORY}
     ports:
       - ${PORT}:${PORT}
     command: npm run docker
@@ -48,5 +48,4 @@ networks:
 volumes:
   pgdata:
   pglogs:
-  applogs:
   nodemodules: {}

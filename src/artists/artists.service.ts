@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArtistDTO } from './dto/create-artist.dto';
 import { Artist } from './artist.inerface';
 import { PrismaService } from '../database/prisma.service';
+import { errors } from '../common/utils/errors';
 
 const select = {
   id: true,
@@ -22,7 +23,7 @@ export class ArtistsService {
       where: { id },
       select,
     });
-    if (!artist) throw new NotFoundException();
+    if (!artist) throw errors.notFound('Artist', id);
     return artist;
   }
 
@@ -41,7 +42,7 @@ export class ArtistsService {
         select,
       });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Artist', id);
     }
   }
 
@@ -49,7 +50,7 @@ export class ArtistsService {
     try {
       await this.prisma.artist.delete({ where: { id } });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Artist', id);
     }
   }
 }

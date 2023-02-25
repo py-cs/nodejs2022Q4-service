@@ -13,9 +13,12 @@ export class Logger implements LoggerService {
     this.commonWriter.write(LogLevels.LOG, message);
   }
 
-  error(message: any) {
-    this.commonWriter.write(LogLevels.ERROR, message);
-    this.errorWriter.write(LogLevels.ERROR, message);
+  error(err: any) {
+    const errorMessage = `${err.status} ${err.response.error} ${JSON.stringify(
+      err.response.message,
+    )}`;
+    this.commonWriter.write(LogLevels.ERROR, errorMessage);
+    this.errorWriter.write(LogLevels.ERROR, errorMessage);
   }
 
   warn(message: any) {

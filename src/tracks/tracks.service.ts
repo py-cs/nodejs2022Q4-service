@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { errors } from '../common/utils/errors';
 import { PrismaService } from '../database/prisma.service';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { Track } from './track.interface';
@@ -24,7 +25,8 @@ export class TracksService {
       where: { id },
       select,
     });
-    if (!track) throw new NotFoundException();
+    if (!track) throw errors.notFound('Track', id);
+
     return track;
   }
 
@@ -43,7 +45,7 @@ export class TracksService {
         select,
       });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Track', id);
     }
   }
 
@@ -51,7 +53,7 @@ export class TracksService {
     try {
       await this.prisma.track.delete({ where: { id } });
     } catch {
-      throw new NotFoundException();
+      throw errors.notFound('Track', id);
     }
   }
 }

@@ -6,41 +6,39 @@ import {
   Logger,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { INTERNAL_ERROR_MESSAGE } from '../constants';
+import { Response } from 'express';
+import { errors } from '../utils/errors';
 
 @Catch(HttpException)
 export class AppExceptionFilter implements ExceptionFilter {
   constructor() {
     process.on('uncaughtException', (error) => {
-      Logger.error(JSON.stringify(error));
+      Logger.error(error);
     });
-    process.on('unhandledRejection', (error) => {
-      throw error;
+    process.on('unhandledRejection', () => {
+      throw errors.internal();
     });
   }
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+
     const statusCode =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
+
     const message =
       exception instanceof HttpException
-        ? exception.getResponse()['message']
-        : INTERNAL_ERROR_MESSAGE;
+        ? exception.getResponse()
+        : exception.message;
 
-    const logMessage = `[Error] - ${statusCode} - ${message}`; // TODO: message format
-
-    Logger.error(logMessage);
+    Logger.error(exception);
 
     response.status(statusCode).json({
-      statusCode,
+      error: exception.name,
       message,
-      path: request.url,
     });
   }
 }

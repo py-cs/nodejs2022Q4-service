@@ -3,7 +3,11 @@ import { createWriteStream } from 'fs';
 import { stat, access, mkdir, readdir } from 'fs/promises';
 import { EOL } from 'os';
 import { PassThrough } from 'stream';
-import { ACTIVE_LOG_LEVELS, LOG_LIMIT } from './logger.constants';
+import {
+  ACTIVE_LOG_LEVELS,
+  LOG_DIRECTORY,
+  LOG_LIMIT,
+} from './logger.constants';
 import { LogLevels } from './logger.types';
 
 export class FileWritter {
@@ -17,9 +21,12 @@ export class FileWritter {
   write(level: LogLevels, message: any) {
     if (!ACTIVE_LOG_LEVELS.includes(level)) return;
 
-    const messageWithTime = `[${new Date().toLocaleString()}] ${message.toString()}`;
-    console[level](messageWithTime);
-    this.fileSplitter.write(messageWithTime + EOL);
+    const messageWithPrefix = `[${new Date().toLocaleString()}] [${level.toUpperCase()}] ${message.toString()}`;
+    this.fileSplitter.write(messageWithPrefix + EOL);
+
+    if (this.directory === LOG_DIRECTORY) {
+      console[level](messageWithPrefix);
+    }
   }
 
   private async init() {
@@ -55,7 +62,9 @@ export class FileWritter {
 
   private get nextFilename(): string {
     const now = new Date();
-    return `${now.toLocaleDateString()}_${this.logFilesNumber++}.log`;
+    return `${now
+      .toLocaleString('en-GB', { timeZone: 'UTC' })
+      .replace(/[\/\:]/g, '.')}_${this.logFilesNumber++}.log`;
   }
 
   private getLogFilePath(filename: string) {
