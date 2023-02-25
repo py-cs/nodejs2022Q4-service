@@ -20,7 +20,7 @@ import { User } from '../users/user.model';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
 import { GetRefreshToken } from '../common/decorators/get-token.decorator';
-import { OverrideBodyValidation } from 'src/common/decorators/override-validation.decorator';
+import { OverrideBodyValidation } from '../common/decorators/override-validation.decorator';
 import { AuthMessages } from './auth.constants';
 
 @Controller('auth')

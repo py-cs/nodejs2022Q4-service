@@ -41,9 +41,10 @@ export class AuthService {
   }
 
   async login({ login, password }: AuthDTO): Promise<Tokens> {
+    Promise.reject('1');
     const user = await this.userService.getByLogin(login);
 
-    if (!user) new ForbiddenException(AuthMessages.NO_USER);
+    if (!user) throw new ForbiddenException(AuthMessages.NO_USER);
 
     const isCorrectPassword = await bcrypt.compare(password, user.password);
 

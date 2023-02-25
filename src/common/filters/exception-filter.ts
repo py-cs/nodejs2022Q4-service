@@ -12,11 +12,12 @@ import { INTERNAL_ERROR_MESSAGE } from '../constants';
 @Catch(HttpException)
 export class AppExceptionFilter implements ExceptionFilter {
   constructor() {
-    ['uncaughtException', 'unhandledRejection'].forEach((event) =>
-      process.on(event, () => {
-        Logger.error(event);
-      }),
-    );
+    process.on('uncaughtException', (error) => {
+      Logger.error(JSON.stringify(error));
+    });
+    process.on('unhandledRejection', (error) => {
+      throw error;
+    });
   }
 
   catch(exception: unknown, host: ArgumentsHost) {
@@ -28,7 +29,9 @@ export class AppExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
     const message =
-      exception instanceof Error ? exception.message : INTERNAL_ERROR_MESSAGE;
+      exception instanceof HttpException
+        ? exception.getResponse()['message']
+        : INTERNAL_ERROR_MESSAGE;
 
     const logMessage = `[Error] - ${statusCode} - ${message}`; // TODO: message format
 
