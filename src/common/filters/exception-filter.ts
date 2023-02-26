@@ -35,11 +35,7 @@ export class AppExceptionFilter implements ExceptionFilter {
           : JSON.stringify(responseData);
 
       const logMessage = `[${status}] ${message}`;
-      if (status < 500) {
-        Logger.warn(logMessage);
-      } else {
-        Logger.error(logMessage);
-      }
+      Logger.error(logMessage);
     } else {
       const message =
         exception instanceof Error
