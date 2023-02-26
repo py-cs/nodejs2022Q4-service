@@ -2,7 +2,11 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { InternalServerErrorException } from '@nestjs/common/exceptions';
+import {
+  ConflictException,
+  ForbiddenException,
+  InternalServerErrorException,
+} from '@nestjs/common/exceptions';
 
 export const errors = {
   notFound: (entityName: string, id: string) =>
@@ -13,5 +17,12 @@ export const errors = {
       `${entityName} with id ${id} can not added to favorites`,
     ),
 
-  internal: () => new InternalServerErrorException('Internal error'),
+  userExists: (login: string) =>
+    new ConflictException(`User with login ${login} already exists`),
+
+  invalidCredentials: () => new ForbiddenException('Invalid login/password'),
+
+  invalidToken: () => new ForbiddenException('Token expired or invalid'),
+
+  internal: () => new InternalServerErrorException('Internal server error'),
 };

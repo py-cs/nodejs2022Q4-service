@@ -21,7 +21,7 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
 import { GetRefreshToken } from '../common/decorators/get-token.decorator';
 import { OverrideBodyValidation } from '../common/decorators/override-validation.decorator';
-import { AuthMessages } from './auth.constants';
+import { errors } from '../common/utils/errors';
 
 @Controller('auth')
 export class AuthController {
@@ -60,8 +60,7 @@ export class AuthController {
     @GetRefreshToken() refreshTokenHeader: string,
     @OverrideBodyValidation() { refreshToken }: RefreshDTO, // TODO: roll back to global validation and token in header
   ) {
-    if (refreshToken !== refreshTokenHeader)
-      throw new UnauthorizedException(AuthMessages.INVALID_TOKEN);
+    if (refreshToken !== refreshTokenHeader) throw errors.invalidToken();
     return this.authService.refresh(userId, refreshToken);
   }
 }

@@ -1,9 +1,23 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePasswordDTO } from './dto/update-password.dto';
 import { PrismaService } from '../database/prisma.service';
 import { errors } from '../common/utils/errors';
+import { scrypt, timingSafeEqual } from 'crypto';
+import { CRYPT_COST, CRYPT_SALT, KEY_LEN } from '../common/constants';
+
+export async function scryptHash(password: string) {
+  return new Promise<string>((resolve) =>
+    scrypt(password, CRYPT_SALT, KEY_LEN, { cost: 2 ** CRYPT_COST }, (_, key) =>
+      resolve(key.toString('base64')),
+    ),
+  );
+}
+
+export async function scryptCompare(password: string, hashed: string) {
+  const hashedPassword = await scryptHash(password);
+  return timingSafeEqual(Buffer.from(hashedPassword), Buffer.from(hashed));
+}
 
 @Injectable()
 export class UsersService {
@@ -24,7 +38,8 @@ export class UsersService {
   }
 
   async create({ login, password }: CreateUserDTO) {
-    const passwordHash = await bcrypt.hash(password, 5);
+    const passwordHash = await scryptHash(password);
+    console.log(passwordHash);
 
     return this.prisma.user.create({
       data: { login, password: passwordHash },
@@ -38,15 +53,13 @@ export class UsersService {
     const user = await this.getById(id);
     if (!user) throw errors.notFound('User', id);
 
-    const isCorrectPassword = await bcrypt.compare(oldPassword, user.password);
+    const isCorrectPassword = await scryptCompare(oldPassword, user.password);
+
     if (!isCorrectPassword) {
       throw new ForbiddenException('Incorrect password');
     }
 
-    const newPasswordHash = await bcrypt.hash(
-      newPassword,
-      +process.env.CRYPT_SALT,
-    );
+    const newPasswordHash = await scryptHash(newPassword);
 
     return this.prisma.user.update({
       where: { id },

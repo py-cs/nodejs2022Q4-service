@@ -4,41 +4,55 @@ import {
   ArgumentsHost,
   HttpException,
   Logger,
-  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { errors } from '../utils/errors';
 
-@Catch(HttpException)
+@Catch()
 export class AppExceptionFilter implements ExceptionFilter {
   constructor() {
     process.on('uncaughtException', (error) => {
-      Logger.error(error);
+      Logger.error(`[uncaughtException] ${error.message}`);
     });
-    process.on('unhandledRejection', () => {
-      throw errors.internal();
+    process.on('unhandledRejection', (error) => {
+      Logger.error(`[unhandledRejection] ${JSON.stringify(error)}`);
     });
   }
 
-  catch(exception: Error, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const statusCode =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status: number;
+    let responseData: any;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : exception.message;
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      responseData = exception.getResponse();
+      const message =
+        typeof responseData === 'object'
+          ? responseData['message']
+          : JSON.stringify(responseData);
 
-    Logger.error(exception);
+      Logger.error(`[${status}] ${message}`);
+    } else {
+      const message =
+        exception instanceof Error
+          ? exception.message
+          : JSON.stringify(exception);
+      Logger.error(`[---] ${message}`);
 
-    response.status(statusCode).json({
-      error: exception.name,
-      message,
-    });
+      const internal = errors.internal();
+      status = internal.getStatus();
+      responseData = internal.getResponse();
+    }
+
+    response.status(status).json(responseData);
+
+    Logger.log(
+      `<-- [${this.constructor.name}] [${status}] ${JSON.stringify(
+        responseData,
+      )}`,
+    );
   }
 }

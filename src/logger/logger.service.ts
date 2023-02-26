@@ -5,7 +5,7 @@ import { LOG_DIRECTORY } from './logger.constants';
 import { LogLevels } from './logger.types';
 
 @Injectable()
-export class Logger implements LoggerService {
+export class AppLogger implements LoggerService {
   private commonWriter = new FileWritter(LOG_DIRECTORY);
   private errorWriter = new FileWritter(resolve(LOG_DIRECTORY, 'errors'));
 
@@ -13,12 +13,9 @@ export class Logger implements LoggerService {
     this.commonWriter.write(LogLevels.LOG, message);
   }
 
-  error(err: any) {
-    const errorMessage = `${err.status} ${err.response.error} ${JSON.stringify(
-      err.response.message,
-    )}`;
-    this.commonWriter.write(LogLevels.ERROR, errorMessage);
-    this.errorWriter.write(LogLevels.ERROR, errorMessage);
+  error(message: any) {
+    this.commonWriter.write(LogLevels.ERROR, message);
+    this.errorWriter.write(LogLevels.ERROR, message);
   }
 
   warn(message: any) {
