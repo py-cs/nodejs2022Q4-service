@@ -25,7 +25,6 @@ export class UsersService {
 
   async create({ login, password }: CreateUserDTO) {
     const passwordHash = await scryptHash(password);
-    console.log(passwordHash);
 
     return this.prisma.user.create({
       data: { login, password: passwordHash },
