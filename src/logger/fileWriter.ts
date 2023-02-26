@@ -21,7 +21,9 @@ export class FileWritter {
   write(level: LogLevels, message: any) {
     if (!ACTIVE_LOG_LEVELS.includes(level)) return;
 
-    const messageWithPrefix = `[${new Date().toLocaleString()}] [${level.toUpperCase()}] ${message.toString()}`;
+    const messageWithPrefix = `[${new Date().toLocaleString('ru-RU', {
+      hour12: false,
+    })}] [${level.toUpperCase()}] ${message.toString()}`;
     this.fileSplitter.write(messageWithPrefix + EOL);
 
     if (this.directory === LOG_DIRECTORY) {
@@ -63,7 +65,7 @@ export class FileWritter {
   private get nextFilename(): string {
     const now = new Date();
     return `${now
-      .toLocaleString('en-GB', { timeZone: 'UTC' })
+      .toLocaleString('ru-RU', { timeZone: 'UTC', hour12: false })
       .replace(/[\/\:]/g, '.')}_${this.logFilesNumber++}.log`;
   }
 

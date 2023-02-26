@@ -24,7 +24,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     let status: number;
-    let responseData: any;
+    let responseData: object | string;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -34,7 +34,12 @@ export class AppExceptionFilter implements ExceptionFilter {
           ? responseData['message']
           : JSON.stringify(responseData);
 
-      Logger.error(`[${status}] ${message}`);
+      const logMessage = `[${status}] ${message}`;
+      if (status < 500) {
+        Logger.warn(logMessage);
+      } else {
+        Logger.error(logMessage);
+      }
     } else {
       const message =
         exception instanceof Error
@@ -49,10 +54,14 @@ export class AppExceptionFilter implements ExceptionFilter {
 
     response.status(status).json(responseData);
 
-    Logger.log(
-      `<-- [${this.constructor.name}] [${status}] ${JSON.stringify(
-        responseData,
-      )}`,
-    );
+    const responseLogMessage = `<-- [${
+      this.constructor.name
+    }] [${status}] ${JSON.stringify(responseData)}`;
+
+    if (status < 500) {
+      Logger.warn(responseLogMessage);
+    } else {
+      Logger.error(responseLogMessage);
+    }
   }
 }

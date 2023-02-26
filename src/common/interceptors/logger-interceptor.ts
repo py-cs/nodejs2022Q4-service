@@ -21,7 +21,7 @@ export class LoggerInterceptor implements NestInterceptor {
       hideCredentials(body || {}),
     )}`;
 
-    Logger.log(requestMessage);
+    Logger.debug(requestMessage);
 
     return next.handle().pipe(
       tap(async (response: Response) => {
@@ -32,7 +32,7 @@ export class LoggerInterceptor implements NestInterceptor {
           hideCredentials(response || {}),
         )}`;
 
-        Logger.log(responseMessage);
+        Logger.debug(responseMessage);
       }),
     );
   }
