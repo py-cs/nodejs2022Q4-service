@@ -12,7 +12,7 @@
 git clone https://github.com/py-cs/nodejs2022Q4-service.git
 ```
 
-Switch to feature/db branch
+Switch to feature/auth-logs branch
 
 ## Installing NPM modules
 
@@ -37,28 +37,24 @@ To stop application use
 npm run docker:stop
 ```
 
-## Checking for vulnerabilities
+## Testing
+
+After application running open new terminal and enter:
+
+To run all tests with authorization
 
 ```
-npm run docker:scan
+npm run test:auth
 ```
+
+## Docs
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/docs
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
-## Testing
+## Logs
 
-After application running open new terminal and enter:
-
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
+With default settings (`.env.example`) `logs/` directory will be created in container and bind-mounted to `logs` directory in project folder. Error logs are stored inside `logs/errors` folder.
+Requests are marked with `-->` and written under DEBUG level. Responses are marked with `<--` and written under DEBUG level in case of successful operation and under WARN level if an error occured while processing request. Logging level can be configured in `.env` file from 1 (just errors) to 5 (all messages).
+Also hidding credentials (passwords and tokens) can be enabled in `.env`
