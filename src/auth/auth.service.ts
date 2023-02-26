@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  scryptCompare,
-  scryptHash,
-  UsersService,
-} from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import { AuthDTO } from './dto/auth.dto';
 import { Tokens } from './types/tokens';
 import { JwtService } from '@nestjs/jwt/dist';
@@ -14,6 +10,7 @@ import {
   TOKEN_REFRESH_EXPIRE_TIME,
 } from './auth.constants';
 import { errors } from '../common/utils/errors';
+import { scryptCompare, scryptHash } from '../common/utils/scrypt';
 
 @Injectable()
 export class AuthService {
