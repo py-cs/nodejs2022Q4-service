@@ -56,5 +56,5 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 ## Logs
 
 With default settings (`.env.example`) `logs/` directory will be created in container and bind-mounted to `logs` directory in project folder. Error logs are stored inside `logs/errors` folder.
-Requests are marked with `-->` and written under DEBUG level. Responses are marked with `<--` and written under DEBUG level in case of successful operation and under WARN level if an error occured while processing request. Logging level can be configured in `.env` file from 1 (just errors) to 5 (all messages).
+Requests are marked with `-->` and written under DEBUG level. Responses are marked with `<--` and written under DEBUG level in case of successful operation and under WARN level if an error occured while processing request. Logging level can be configured in `.env` file from 0 (all messages) to 4 (just errors).
 Also hidding credentials (passwords and tokens) can be enabled in `.env`
