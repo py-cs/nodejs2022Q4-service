@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { AuthDTO } from './dto/auth.dto';
-import { Tokens } from './types/tokens';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt/dist';
 import {
   JWT_SECRET_KEY,
@@ -9,8 +7,11 @@ import {
   TOKEN_EXPIRE_TIME,
   TOKEN_REFRESH_EXPIRE_TIME,
 } from './auth.constants';
+import { UsersService } from '../users/users.service';
+import { AuthDTO } from './dto/auth.dto';
 import { errors } from '../common/utils/errors';
-import { scryptCompare, scryptHash } from '../common/utils/scrypt';
+import { CRYPT_COST } from '../common/constants';
+import { Tokens } from './types/tokens';
 
 @Injectable()
 export class AuthService {
@@ -20,8 +21,6 @@ export class AuthService {
   ) {}
 
   async signup(authDTO: AuthDTO) {
-    // Promise.reject('dfsdf');
-    // throw new Error('oops');
     const { login, password } = authDTO;
     const candidate = await this.userService.getByLogin(login);
     if (candidate) throw errors.userExists(login);
@@ -40,7 +39,7 @@ export class AuthService {
     const user = await this.userService.getByLogin(login);
     if (!user) throw errors.invalidCredentials();
 
-    const isCorrectPassword = await scryptCompare(password, user.password);
+    const isCorrectPassword = await bcrypt.compare(password, user.password);
 
     if (!isCorrectPassword) throw errors.invalidCredentials();
 
@@ -56,7 +55,7 @@ export class AuthService {
     const user = await this.userService.getById(id);
     if (!user.refreshHash) throw errors.invalidToken();
 
-    const isTokenValid = await scryptCompare(refreshToken, user.refreshHash);
+    const isTokenValid = await bcrypt.compare(refreshToken, user.refreshHash);
 
     if (!isTokenValid) throw errors.invalidToken();
 
@@ -79,7 +78,7 @@ export class AuthService {
       ),
     ]);
 
-    const refreshHash = await scryptHash(refreshToken);
+    const refreshHash = await bcrypt.hash(refreshToken, CRYPT_COST);
 
     await this.userService.updateRefreshHash(sub, refreshHash);
 

@@ -13,15 +13,12 @@ import { AuthService } from './auth.service';
 import { AuthDTO } from './dto/auth.dto';
 import { Tokens } from './types/tokens';
 import { UseInterceptors, UsePipes } from '@nestjs/common/decorators';
-import { RefreshDTO } from './dto/refresh.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { TransformPlainToInstance } from 'class-transformer';
 import { User } from '../users/user.model';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
 import { GetRefreshToken } from '../common/decorators/get-token.decorator';
-import { OverrideBodyValidation } from '../common/decorators/override-validation.decorator';
-import { errors } from '../common/utils/errors';
 
 @Controller('auth')
 export class AuthController {
@@ -57,10 +54,8 @@ export class AuthController {
   )
   refresh(
     @GetCurrentUserId() userId: string,
-    @GetRefreshToken() refreshTokenHeader: string,
-    @OverrideBodyValidation() { refreshToken }: RefreshDTO, // TODO: roll back to global validation and token in header
+    @GetRefreshToken() refreshToken: string,
   ) {
-    if (refreshToken !== refreshTokenHeader) throw errors.invalidToken();
     return this.authService.refresh(userId, refreshToken);
   }
 }
